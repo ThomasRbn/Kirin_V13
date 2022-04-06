@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('prune')
+        .setName('kprune')
         .setDescription('Prune up to 99 messages.')
         .addIntegerOption(option => option.setName('amount').setDescription('Number of messages to prune')),
     async execute(interaction) {
