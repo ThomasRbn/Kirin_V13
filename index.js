@@ -13,7 +13,7 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-    console.log('Ready!');
+    console.log('Kirin prêt à niquer des mères!');
 });
 
 client.on('interactionCreate', async interaction => {
