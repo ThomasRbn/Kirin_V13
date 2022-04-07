@@ -1,20 +1,18 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const {Permissions, client, MessageEmbed} = require("discord.js");
-const { clientId } = require("../config.json");
+const {SlashCommandBuilder} = require('@discordjs/builders');
+const {Permissions, MessageEmbed} = require("discord.js");
+const {clientId} = require("../config.json");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('kban')
         .setDescription('Select a member and ban them (but not really).')
         .addUserOption(option => option.setName('cible').setDescription('Membre à bannir').setRequired(true))
-        .addStringOption(option => option.setName('raison').setDescription('Raison du ban'))
-        .addIntegerOption(option => option.setName('duree').setDescription('Durée du ban en jours')),
+        .addStringOption(option => option.setName('raison').setDescription('Raison du ban')),
 
 
     async execute(interaction) {
-        const cible = interaction.options.getMember('cible');
+        const cible = interaction.options.getUser('cible');
         const raison = interaction.options.getString('raison');
-        const duree = interaction.options.getInteger('duree');
 
         if (cible.id === interaction.member.id)
             return interaction.reply({content: "❌ - Vous ne pouvez pas vous bannir vous même"});
@@ -25,8 +23,14 @@ module.exports = {
         if (clientId === cible.id)
             return interaction.reply({content: "❌ - Je ne peux pas me bannir moi même °=°"});
 
-        interaction.reply({embeds: [new MessageEmbed().setColor("GREEN").setDescription("✅ - Membre banni")]})
+        const embedBan = new MessageEmbed()
+            .setColor("GREEN")
+            .setTitle("✅ - Membre banni")
+            .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
+            .addField("Membre : ", cible.tag, true)
+            .addField("Raison : ", raison, true);
 
-        return interaction.reply({ content: `You wanted to ban: ${cible.tag}`});
+        interaction.reply({embeds: [embedBan]})
+        //await cible.kick({reason: raison});
     },
 };
