@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders');
-const {Permissions, MessageEmbed} = require("discord.js");
+const {Permissions, MessageEmbed, GuildBan} = require("discord.js");
 const {clientId} = require("../config.json");
 
 module.exports = {
@@ -32,39 +32,47 @@ module.exports = {
             .setTitle("❌ - Échec de la commande")
             .setTimestamp()
             .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
-            .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()})
+            .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()});
+
+        const embedDM = new MessageEmbed()
+            .setColor("YELLOW")
+            .setDescription("Vous avez été banni du serveur **" + interaction.guild.name + "**")
+            .addField("Modérateur :", interaction.user.tag, true);
 
         if (raison === null) {
-            embedSuccess.addField("Raison : ", "Aucune raison\n n'a été fournie", true);
+            embedSuccess.addField("Raison : ", "Aucune raison\nn'a été fournie", true);
+            embedDM.addField("Raison : ", "Aucune raison\nn'a été fournie", true);
         } else {
             embedSuccess.addField("Raison : ", raison, true);
+            embedDM.addField("Raison : ", raison, true);
         }
 
         if (duree === null) {
             embedSuccess.addField("Durée : ", definitif, true);
+            embedDM.addField("Durée : ", definitif, true);
         } else {
             embedSuccess.addField("Durée : ", duree + " jours", true);
-
+            embedDM.addField("Durée : ", duree + " jours", true);
         }
 
         if (cible.id === interaction.user.id) {
             embedFail.setDescription("❌ - Vous ne pouvez pas vous bannir vous même")
-            return interaction.reply({embeds: embedFail});
+            return interaction.reply({embeds: [embedFail]});
         }
 
         if (!interaction.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS)) {
             embedFail.setDescription("❌ - Vous n'avez pas l'autorisation de bannir des membres")
-            return interaction.reply({embeds: embedFail});
-
+            return interaction.reply({embeds: [embedFail]});
         }
 
         if (clientId === cible.id) {
-            embedFail.setDescription("❌ - Je ne peux pas me bannir moi même °=°")
-            return interaction.reply({embeds: embedFail});
-
+            embedFail.setDescription("**Je ne peux pas me bannir moi même °=°**")
+            return interaction.reply({embeds: [embedFail]});
         }
 
+        await cible.createDM();
+        await cible.send({embeds: [embedDM]});
+        await interaction.guild.members.ban(cible, {reason: [raison], days: [duree]});
         interaction.reply({embeds: [embedSuccess]})
-        //await cible.ban({reason: raison, days: duree});
     },
 };
