@@ -22,24 +22,29 @@ module.exports = {
             .setTitle("✅ - Membre banni")
             .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
             .addField("Membre : ", cible.tag, true)
-            .setThumbnail("https://drive.google.com/file/d/1bAUdMwWZuTet4yN0FfDaw5VlT0uyOI6L/view?usp=sharing");
+            .setTimestamp()
+            .setThumbnail("https://i.imgur.com/O5DJ8qK.png")
+            .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()});
 
 
         const embedFail = new MessageEmbed()
             .setColor("RED")
             .setTitle("❌ - Échec de la commande")
-            .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()});
+            .setTimestamp()
+            .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
+            .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()})
 
-        if (duree === null){
+        if (raison === null) {
+            embedSuccess.addField("Raison : ", "Aucune raison\n n'a été fournie", true);
+        } else {
+            embedSuccess.addField("Raison : ", raison, true);
+        }
+
+        if (duree === null) {
             embedSuccess.addField("Durée : ", definitif, true);
         } else {
             embedSuccess.addField("Durée : ", duree + " jours", true);
-        }
 
-        if (raison === undefined){
-            embedSuccess.addField("Raison : ","Aucune raison n'a été fournie");
-        } else {
-            embedSuccess.addField("Raison : ", raison);
         }
 
         if (cible.id === interaction.user.id) {
