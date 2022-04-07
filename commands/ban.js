@@ -17,15 +17,15 @@ module.exports = {
         const duree = interaction.options.getInteger('duree');
 
         if (cible.id === interaction.member.id)
-            return interaction.reply({content: "Vous ne pouvez pas vous bannir vous même"});
+            return interaction.reply({content: "❌ - Vous ne pouvez pas vous bannir vous même"});
 
         if (!interaction.member.permissions.has(Permissions.FLAGS.BAN_MEMBERS))
-            return interaction.reply({content: "Vous n'avez pas l'autorisation de bannir des membres"});
+            return interaction.reply({content: "❌ - Vous n'avez pas l'autorisation de bannir des membres"});
 
         if (clientId === cible.id)
-            return interaction.reply({content: "Je ne peux pas me bannir moi même °=°"});
+            return interaction.reply({content: "❌ - Je ne peux pas me bannir moi même °=°"});
 
-        interaction.reply({embeds: [new MessageEmbed().setColor("GREEN").setDescription("Membre banni")]})
+        interaction.reply({embeds: [new MessageEmbed().setColor("GREEN").setDescription("✅ - Membre banni")]})
 
         return interaction.reply({ content: `You wanted to ban: ${cible.tag}`});
     },
