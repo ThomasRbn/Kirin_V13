@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('@discordjs/builders');
-const {Permissions} = require("discord.js");
+const {Permissions, MessageEmbed} = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,6 +14,20 @@ module.exports = {
         }
 
         const amount = interaction.options.getInteger('amount');
+        const embedFail = new MessageEmbed()
+            .setColor("RED")
+            .setTitle("❌ - Échec de la commande")
+            .setTimestamp()
+            .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
+            .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()});
+
+        if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)){
+            embedFail.setDescription("❌ - Vous n'avez pas l'autorisation de supprimer des messages")
+            await interaction.reply({embeds: [embedFail]});
+            await sleep(1500);
+            await interaction.channel.bulkDelete(1, true);
+            return;
+        }
 
         if (amount <= 1 || amount > 100) {
             return interaction.reply({
