@@ -16,7 +16,7 @@ module.exports = {
 
         const embedSuccess = new MessageEmbed()
             .setColor("GREEN")
-            .setTitle("✅ - Membre banni")
+            .setTitle("✅ - Membre expulsé")
             .setAuthor({name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()})
             .addField("Membre : ", cible.tag, true)
             .setTimestamp()
