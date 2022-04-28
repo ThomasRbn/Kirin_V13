@@ -35,13 +35,13 @@ module.exports = {
             .setFooter({text: "Ingénieur Kirin Jindosh", iconURL: interaction.client.user.displayAvatarURL()});
 
         const embedDM = new MessageEmbed()
-            .setColor("YELLOW")
+            .setColor("RED")
             .setDescription("Vous avez été banni du serveur **" + interaction.guild.name + "**")
             .addField("Modérateur :", interaction.user.tag, true);
 
         if (raison === null) {
-            embedSuccess.addField("Raison : ", "Aucune raison\nn'a été fournie", true);
-            embedDM.addField("Raison : ", "Aucune raison\nn'a été fournie", true);
+            embedSuccess.addField("Raison : ", "Aucune raison n'a été fournie", true);
+            embedDM.addField("Raison : ", "Aucune raison n'a été fournie", true);
         } else {
             embedSuccess.addField("Raison : ", raison, true);
             embedDM.addField("Raison : ", raison, true);
@@ -70,9 +70,11 @@ module.exports = {
             return interaction.reply({embeds: [embedFail]});
         }
 
-        await cible.createDM();
-        await cible.send({embeds: [embedDM]});
+        if (interaction.guild.members.resolve(cible)){
+            await cible.createDM();
+            await cible.send({embeds: [embedDM]});
+        }
         await interaction.guild.members.ban(cible, {reason: [raison], days: [duree]});
-        interaction.reply({embeds: [embedSuccess]})
+        await interaction.reply({embeds: [embedSuccess]})
     },
 };
