@@ -13,10 +13,8 @@ module.exports = {
         } catch (err) {
             if (err) console.error(err);
 
-            await interaction.reply({
-                content: "An error occurred while executing that command.",
-                ephemeral: true,
-            });
+            await interaction.reply({ content: "Essaye encore BG <3"});
+            await interaction.channel.bulkDelete(1, true);
         }
     }
 }
