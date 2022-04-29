@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const {MessageEmbed} = require("discord.js");
+const {MessageEmbed, MessageActionRow, MessageButton} = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -32,20 +32,47 @@ module.exports = {
             const banReason = banLog.reason;
             const banDate = banLog.createdAt.toLocaleTimeString('fr-FR');
 
-            console.log(banReason, banDate);
-
             const embedUser = new MessageEmbed()
                 .setColor("ORANGE")
                 .setTitle('Bannissement de ' + await interaction.client.users.fetch(idUser))
                 .addField("Banni le :", banDate, true)
                 .addField("Raison :", banReason, true);
 
+            const btn = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId('oui')
+                        .setLabel('Confirmer')
+                        .setStyle('SUCCESS'),
+
+                    new MessageButton()
+                        .setCustomId('non')
+                        .setLabel("Annuler")
+                        .setStyle("DANGER"),
+                );
+
+            await interaction.reply({embeds: [embedUser], components: [btn]});
+
             const embedUnban = new MessageEmbed()
                 .setColor("GREEN")
                 .setTitle(await interaction.client.users.fetch(idUser) + " à bien été débanni");
 
-            await interaction.guild.members.unban(idUser);
-            await interaction.reply({embeds: [embedUnban]});
+            const embedCancel = new MessageEmbed()
+                .setColor("ORANGE")
+                .setTitle("Débannissement annulé");
+
+            const collector = interaction.channel.createMessageComponentCollector();
+
+            collector.on('collect', async i => {
+                if (i.customId === 'oui') {
+                    await interaction.guild.members.unban(idUser);
+                    return i.update({embeds: [embedUnban], components: null});
+                } else if (i.customId === 'non'){
+                    return i.update({embeds: [embedCancel], components: null});
+                }
+            });
+
+
 
         } catch(e) { // Si pas de ban
             if(e.code !== 10026) throw e;
