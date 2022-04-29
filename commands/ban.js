@@ -74,6 +74,7 @@ module.exports = {
             await cible.createDM();
             await cible.send({embeds: [embedDM]});
         }
+
         await interaction.guild.members.ban(cible, {reason: [raison], days: [duree]});
         await interaction.reply({embeds: [embedSuccess]})
     },

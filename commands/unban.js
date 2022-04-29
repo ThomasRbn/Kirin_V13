@@ -5,20 +5,16 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('kunban')
         .setDescription('Débannir un membre')
-        .addStringOption(option => option.setName("id").setDescription("ID à débannir").setRequired(true))
-        .addBooleanOption(option => option.setName("prevenir").setDescription("Prevenir du débannissement").setRequired(true)),
+        .addStringOption(option => option
+            .setName("id")
+            .setDescription("ID à débannir")
+            .setRequired(true)),
+
 
     async execute(interaction) {
         try {
             const idUser = interaction.options.getString('id');
             const utili = await interaction.client.users.fetch(idUser);
-
-            let prevenir = interaction.options.getBoolean('prevenir');
-            if (prevenir){
-                prevenir = 'Oui';
-            } else{
-                prevenir = 'Non';
-            }
 
             //Recherche du ban si il existe
             await interaction.guild.bans.fetch(idUser);
@@ -28,14 +24,18 @@ module.exports = {
             });
             const banLog = fetchedLogs.entries.first();
             const banReason = banLog.reason;
-            const banDate = banLog.createdAt;
+            const banDate = banLog.createdAt.toLocaleString('fr-FR');
+            const banMod = banLog.executor;
+
+            console.log(interaction.client.member)
 
             //Création des embeds
             const embedUser = new MessageEmbed()
                 .setColor("ORANGE")
                 .setTitle('Bannissement de ' + await interaction.client.users.fetch(idUser))
-                .addField("Banni le :", banDate + "err", true)
-                .addField("Raison :", banReason + "err", true);
+                .addField("Banni le :", banDate, true)
+                .addField("Raison :", banReason, true)
+                .addField("Banni par :", banMod.tag, true);
 
             const embedUnban = new MessageEmbed()
                 .setColor("GREEN")
@@ -46,7 +46,7 @@ module.exports = {
                 .setTitle("Débannissement annulé");
 
             //Création boutons
-            const btn = new MessageActionRow()
+            let btn = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
                         .setCustomId('oui')
@@ -65,17 +65,22 @@ module.exports = {
             const collector = interaction.channel.createMessageComponentCollector();
             collector.on('collect', async i => {
                 if (i.customId === 'oui') {
+                    await interaction.deleteReply();
                     await interaction.guild.members.unban(idUser);
+                    if (prevenir === 'Oui'){
+                        await utili.createDM();
+                        await utili.send({embeds: [embedDM]});
+                    }
                     return i.reply({embeds: [embedUnban]});
-                } else if (i.customId === 'non'){
+                } else if (i.customId === 'non') {
+                    await interaction.deleteReply();
                     return i.reply({embeds: [embedCancel]});
                 }
             });
 
 
-
-        } catch(e) { // Si pas de ban
-            if(e.code !== 10026) throw e;
+        } catch (e) { // Si pas de ban
+            if (e.code !== 10026) throw e;
             const idUser = interaction.options.getString('id');
             const utili = await interaction.client.users.fetch(idUser);
 
