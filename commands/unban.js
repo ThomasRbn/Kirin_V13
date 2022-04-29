@@ -28,15 +28,14 @@ module.exports = {
             });
 
             const banLog = fetchedLogs.entries.first();
-            console.log(banLog);
             const banReason = banLog.reason;
-            const banDate = banLog.createdAt.toLocaleTimeString('fr-FR');
+            const banDate = banLog.createdAt;
 
             const embedUser = new MessageEmbed()
                 .setColor("ORANGE")
                 .setTitle('Bannissement de ' + await interaction.client.users.fetch(idUser))
-                .addField("Banni le :", banDate, true)
-                .addField("Raison :", banReason, true);
+                .addField("Banni le :", banDate + "err", true)
+                .addField("Raison :", banReason + "err", true);
 
             const btn = new MessageActionRow()
                 .addComponents(
@@ -66,9 +65,9 @@ module.exports = {
             collector.on('collect', async i => {
                 if (i.customId === 'oui') {
                     await interaction.guild.members.unban(idUser);
-                    return i.update({embeds: [embedUnban], components: null});
+                    return i.reply({embeds: [embedUnban]});
                 } else if (i.customId === 'non'){
-                    return i.update({embeds: [embedCancel], components: null});
+                    return i.reply({embeds: [embedCancel]});
                 }
             });
 
