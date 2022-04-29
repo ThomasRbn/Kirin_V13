@@ -20,23 +20,32 @@ module.exports = {
                 prevenir = 'Non';
             }
 
+            //Recherche du ban si il existe
             await interaction.guild.bans.fetch(idUser);
-
             const fetchedLogs = await interaction.guild.fetchAuditLogs({
                 limit: 1,
                 type: 'MEMBER_BAN_ADD',
             });
-
             const banLog = fetchedLogs.entries.first();
             const banReason = banLog.reason;
             const banDate = banLog.createdAt;
 
+            //Création des embeds
             const embedUser = new MessageEmbed()
                 .setColor("ORANGE")
                 .setTitle('Bannissement de ' + await interaction.client.users.fetch(idUser))
                 .addField("Banni le :", banDate + "err", true)
                 .addField("Raison :", banReason + "err", true);
 
+            const embedUnban = new MessageEmbed()
+                .setColor("GREEN")
+                .setTitle((await interaction.client.users.fetch(idUser)).tag + " à bien été débanni");
+
+            const embedCancel = new MessageEmbed()
+                .setColor("ORANGE")
+                .setTitle("Débannissement annulé");
+
+            //Création boutons
             const btn = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
@@ -52,16 +61,8 @@ module.exports = {
 
             await interaction.reply({embeds: [embedUser], components: [btn]});
 
-            const embedUnban = new MessageEmbed()
-                .setColor("GREEN")
-                .setTitle(await interaction.client.users.fetch(idUser) + " à bien été débanni");
-
-            const embedCancel = new MessageEmbed()
-                .setColor("ORANGE")
-                .setTitle("Débannissement annulé");
-
+            //Evenement
             const collector = interaction.channel.createMessageComponentCollector();
-
             collector.on('collect', async i => {
                 if (i.customId === 'oui') {
                     await interaction.guild.members.unban(idUser);
